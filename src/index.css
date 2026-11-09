@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Pixelify+Sans:wght@600;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-ink-950: #0F1319;
+  --color-ink-900: #151A22;
+  --color-ink-800: #1D242E;
+  --color-ink-700: #2A3341;
+  --color-paper: #F5F2EC;
+  --color-amber-400: #E8A33D;
+  --color-amber-500: #D9902A;
+  --color-sage-400: #7FA88E;
+  --color-sage-500: #5F8A72;
+
+  /* tema krem */
+  --color-cream: #F6F1E7;
+  --color-blk: #111111;
+  --color-sticker-yellow: #F7C948;
+  --color-sticker-green: #8EDC9B;
+  --color-sticker-pink: #FF9EC4;
+  --color-sticker-blue: #8FB8FF;
+  --color-sticker-orange: #FF9B54;
+
+  --font-mono: "JetBrains Mono", monospace;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+  --font-display: "Pixelify Sans", monospace;
+  --font-hand: "Caveat", cursive;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background-color: #F6F1E7;
+  background-image: radial-gradient(#D8D0BD 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: #111111;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::selection {
+  background-color: #F7C948;
+  color: #111111;
+}
+
+.blink-photo { --x: 50%; --y: 50%; }
+
+.blink-photo .alt,
+.blink-photo .base { will-change: opacity; }
+
+/* siklus 4 detik: ±2 detik foto kamu, ±2 detik Deadpool, fade ±0,6 detik */
+.blink-photo .alt  { opacity: 0; animation: photo-alt 4s ease-in-out infinite; }
+.blink-photo .base { animation: photo-base 4s ease-in-out infinite; }
+
+@keyframes photo-alt {
+  0%, 35%  { opacity: 0; }
+  50%, 85% { opacity: 1; }
+  100%     { opacity: 0; }
+}
+@keyframes photo-base {
+  0%, 38%   { opacity: 1; }
+  48%, 85%  { opacity: 0; }
+  95%, 100% { opacity: 1; }
+}
+
+/* hover (hanya perangkat dengan mouse): berhenti kedip, spotlight ikut kursor */
+@media (hover: hover) and (pointer: fine) {
+  .blink-photo:hover .base { animation: none; opacity: 1; }
+  .blink-photo:hover .alt {
+    animation: none;
+    opacity: 1;
+    -webkit-mask-image: radial-gradient(circle 130px at var(--x) var(--y), #000 30%, transparent 100%);
+    mask-image: radial-gradient(circle 130px at var(--x) var(--y), #000 30%, transparent 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blink-photo .alt, .blink-photo .base { animation: none; }
+}
+
+/* melayang pelan (stiker Hero) */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.float-y { animation: float-y 4s ease-in-out infinite; will-change: transform; }
+
+/* pita teks berjalan */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+  will-change: transform;
+}
+.marquee:hover .marquee-track { animation-play-state: paused; }
+
+/* stiker bergoyang saat di-hover */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-6deg); }
+  75%      { transform: rotate(6deg); }
+}
+.wiggle:hover { animation: wiggle 0.4s ease-in-out; }
+
+/* tombol tertekan saat diklik */
+.btn-press:active {
+  translate: 3px 3px;
+  box-shadow: none;
+}

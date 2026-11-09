@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Asrul portfolio favicon">
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#0F172A"/>
+  <circle cx="32" cy="32" r="22" fill="url(#bg)" opacity="0.95"/>
+  <path d="M20 45V19h8.5l7.4 13.2V19H44v26h-8.1L28.5 31.7V45H20z" fill="#0F172A"/>
+</svg>
