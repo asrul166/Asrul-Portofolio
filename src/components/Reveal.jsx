@@ -1,11 +1,23 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-export default function Reveal({ children, delay = 0 }) {
+// gaya masuk yang bisa dipilih per section
+const from = {
+  up: { opacity: 0, y: 32 },
+  left: { opacity: 0, x: -48 },
+  right: { opacity: 0, x: 48 },
+  pop: { opacity: 0, scale: 0.92 },
+  tilt: { opacity: 0, y: 32, rotate: -2 },
+};
+
+const shown = { opacity: 1, x: 0, y: 0, scale: 1, rotate: 0 };
+
+export default function Reveal({ children, delay = 0, variant = "up", className = "" }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      className={className}
+      initial={from[variant] || from.up}
+      whileInView={shown}
       viewport={{ once: false, amount: 0.1 }}
       transition={{ duration: 0.6, ease: "easeOut", delay }}
     >

@@ -1,151 +1,172 @@
-import React from "react";
-import { ArrowRight } from "lucide-react";
+import React, { useCallback, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 import SectionTitle from "./SectionTitle";
-import { RevealItem } from "./Reveal";
+import ProjectCover from "./ProjectCover";
+import ProjectModal from "./ProjectModal";
+import { projects, categories, statusStyles, coverTones } from "../data/projects";
 
-const projects = [
-  {
-    title: "ERPNext Study Case — CV. Bangunan Jaya Makmur",
-    desc: "Full ERPNext/Frappe v16 setup on WSL for a fictional construction materials store. Accounting, HR, buying/selling, and CRM modules configured; project module in progress. Includes Bahasa Indonesia localization.",
-    tags: ["Frappe v16", "ERPNext", "WSL"],
-    status: "in-progress",
-    image: "ERP.png",
-    link: "",
-  },
-  {
-    title: "E-Shopper",
-    desc: "E-Shopper is a web-based e-commerce application that allows users to browse products, manage shopping carts, and enjoy a seamless online shopping experience.",
-    tags: ["HTML", "CSS", "Javascript"],
-    status: "done",
-    image: "E-Shopper.png",
-    link: "",
-  },
-  {
-    title: "WeatherApp",
-    desc: "A real-time weather application that provides current weather conditions worldwide using the OpenWeather API.",
-    tags: ["Flutter", "Dart", "Firebase"],
-    status: "done",
-    image: "",
-    link: "",
-  },
-  {
-    title: "SolvexaERP Content Pipeline",
-    desc: "Instagram content and Reels for SolvexaERP — including a local Whisper AI setup for subtitle generation, feeding into a CapCut editing workflow.",
-    tags: ["CapCut", "Whisper AI", "Content", "Canva", "Adobe Photoshop", "Instagram"],
-    status: "ongoing",
-    image: "",
-    link: "",
-  },
-  {
-    title: "AutoComm",
-    desc: "AutoComm is a commission management application that simplifies commission calculations, tracks sales performance, and generates printable reports for businesses.",
-    tags: ["ReactJS", "Tailwind CSS", "NodeJS", "PostgreSQL", "TypeScript"],
-    status: "done",
-    image: "AutoCommm.png",
-    link: "",
-  },
-  {
-    title: "SiMKS",
-    desc: "SiMKS is a web-based cooperation agreement management system that streamlines document management, monitors agreement statuses, and provides automated expiration reminders and reporting.",
-    tags: ["ReactJS", "Tailwind CSS", "NodeJS", "Express", "PostgreSQL", "TypeScript"],
-    status: "in-progress",
-    image: "",
-    link: "",
-  },
-];
-
-const statusStyles = {
-  done: "bg-sticker-green",
-  "in-progress": "bg-sticker-yellow",
-  ongoing: "bg-sticker-orange",
-};
-
-const coverTones = [
-  "bg-sticker-blue",
-  "bg-sticker-pink",
-  "bg-sticker-green",
-  "bg-sticker-yellow",
-  "bg-sticker-orange",
-];
-
-function Cover({ image, title, tone }) {
-  if (image) {
-    return (
-      <img
-        src={image}
-        alt={title}
-        loading="lazy"
-        className="h-full w-full object-cover"
-      />
-    );
-  }
-  return (
-    <div className={`flex h-full w-full items-center justify-center ${tone}`}>
-      <span className="font-display text-5xl font-bold text-blk">
-        {title.slice(0, 2).toUpperCase()}
-      </span>
-    </div>
-  );
-}
+const toneOf = (p) => coverTones[projects.indexOf(p) % coverTones.length];
 
 export default function Projects() {
+  const [filter, setFilter] = useState("All");
+  const [active, setActive] = useState(null);
+  const trigger = useRef(null);
+
+  const visible = filter === "All" ? projects : projects.filter((p) => p.category === filter);
+  const count = (c) => (c === "All" ? projects.length : projects.filter((p) => p.category === c).length);
+
+  const open = (p, e) => {
+    trigger.current = e.currentTarget;
+    setActive(p);
+  };
+
+  const close = useCallback(() => {
+    setActive(null);
+    trigger.current?.focus({ preventScroll: true });
+  }, []);
+
   return (
     <section id="projects">
       <SectionTitle cmd="$ ls ./work" tone="bg-sticker-pink">
         Work Log
       </SectionTitle>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((p, i) => (
-          <RevealItem key={p.title} index={i} className="h-full">
-            <article
-              className="flex h-full flex-col overflow-hidden rounded-xl border-2 border-blk bg-white shadow-[5px_5px_0_#111] transition-transform hover:-translate-y-1"
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-1 rounded-2xl border-2 border-fg bg-chip p-1 shadow-[3px_3px_0_var(--color-fg)]">
+          {categories.map((c) => (
+            <button
+              key={c}
+              type="button"
+              aria-pressed={filter === c}
+              onClick={() => setFilter(c)}
+              className={`relative rounded-full px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide outline-none focus-visible:ring-2 focus-visible:ring-fg ${
+                filter === c ? "text-blk" : "text-fg hover:bg-fg/5"
+              }`}
             >
-              <div className="aspect-video overflow-hidden border-b-2 border-blk bg-cream">
-                <Cover image={p.image} title={p.title} tone={coverTones[i % coverTones.length]} />
-              </div>
+              {filter === c && (
+                <motion.span
+                  layoutId="project-filter-pill"
+                  className="absolute inset-0 rounded-full border-2 border-fg bg-sticker-pink"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
+              <span className="relative">
+                {c} <span className="font-mono text-[10px] opacity-60">{count(c)}</span>
+              </span>
+            </button>
+          ))}
+        </div>
 
-              <div className="flex flex-1 flex-col p-5">
-                <span
-                  className={`self-start rounded border-2 border-blk px-2 py-0.5 font-mono text-[11px] font-bold text-blk ${statusStyles[p.status]}`}
-                >
-                  {p.status}
-                </span>
-
-                <h3 className="mt-3 text-lg font-extrabold leading-snug text-blk">{p.title}</h3>
-
-                <p className="mt-2 text-sm leading-relaxed text-[#4A463C] line-clamp-3">
-                  {p.desc}
-                </p>
-
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {p.tags.map((t) => (
-                    <span
-                      key={t}
-                      className="rounded border border-blk/30 bg-cream px-1.5 py-0.5 font-mono text-[11px] text-[#4A463C]"
-                    >
-                      #{t.replace(/\s+/g, "").toLowerCase()}
-                    </span>
-                  ))}
-                </div>
-
-                {p.link && (
-                  <div className="mt-auto pt-5">
-                    <a
-                      href={p.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn-press inline-flex items-center gap-2 rounded-md border-2 border-blk bg-blk px-4 py-2 text-sm font-bold text-cream shadow-[3px_3px_0_#F7C948] transition-transform hover:-translate-y-0.5"
-                    >
-                      Details <ArrowRight size={14} />
-                    </a>
-                  </div>
-                )}
-              </div>
-            </article>
-          </RevealItem>
-        ))}
+        <p className="font-hand text-xl text-soft">psst — click a card to open it</p>
       </div>
+
+      <div className="relative grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <AnimatePresence mode="popLayout" initial={false}>
+          {visible.map((p, i) => {
+            // pola bento saat "All": kartu lebar berselang-seling kiri/kanan
+            const wide = filter === "All" && (i % 4 === 0 || i % 4 === 3);
+            const tone = toneOf(p);
+
+            return (
+              <motion.div
+                key={p.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className={wide ? "lg:col-span-2" : ""}
+              >
+                <motion.article
+                  layoutId={`project-${p.id}`}
+                  style={{ borderRadius: 12 }}
+                  className={`group relative flex h-full flex-col overflow-hidden border-2 border-fg bg-surface shadow-[5px_5px_0_var(--color-fg)] transition-[translate,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[8px_8px_0_var(--color-fg)] focus-within:-translate-y-1 focus-within:shadow-[8px_8px_0_var(--color-fg)] ${
+                    wide ? "lg:flex-row" : ""
+                  }`}
+                >
+                  <motion.div
+                    layoutId={`cover-${p.id}`}
+                    className={`aspect-video shrink-0 overflow-hidden border-b-2 border-fg ${
+                      wide ? "lg:aspect-auto lg:w-1/2 lg:border-b-0 lg:border-r-2" : ""
+                    }`}
+                  >
+                    <ProjectCover project={p} tone={tone} />
+                  </motion.div>
+
+                  <div className="flex flex-1 flex-col p-5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`rounded border-2 border-fg px-2 py-0.5 font-mono text-[11px] font-bold text-fg ${statusStyles[p.status]}`}
+                      >
+                        {p.status}
+                      </span>
+                      <span className="font-mono text-[11px] uppercase tracking-wide text-muted">
+                        {p.category}
+                      </span>
+                    </div>
+
+                    <h3 className="mt-3 text-lg font-extrabold leading-snug text-fg">{p.title}</h3>
+
+                    <p
+                      className={`mt-2 text-sm leading-relaxed text-soft ${
+                        wide ? "line-clamp-3 lg:line-clamp-5" : "line-clamp-3"
+                      }`}
+                    >
+                      {p.desc}
+                    </p>
+
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {p.tags.slice(0, 4).map((t) => (
+                        <span
+                          key={t}
+                          className="rounded border border-fg/30 bg-chip px-1.5 py-0.5 font-mono text-[11px] text-soft"
+                        >
+                          #{t.replace(/\s+/g, "").toLowerCase()}
+                        </span>
+                      ))}
+                      {p.tags.length > 4 && (
+                        <span className="px-1 py-0.5 font-mono text-[11px] text-muted">
+                          +{p.tags.length - 4}
+                        </span>
+                      )}
+                    </div>
+
+                    <span className="mt-auto inline-flex items-center gap-1 pt-5 font-mono text-xs font-bold text-fg">
+                      <span className="underline decoration-2 underline-offset-4 decoration-sticker-pink">
+                        view details
+                      </span>
+                      <ArrowUpRight
+                        size={14}
+                        className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      />
+                    </span>
+                  </div>
+
+                  {/* seluruh kartu bisa diklik / di-Enter */}
+                  <button
+                    type="button"
+                    onClick={(e) => open(p, e)}
+                    aria-haspopup="dialog"
+                    aria-label={`Open details: ${p.title}`}
+                    className="absolute inset-0 z-10 cursor-pointer rounded-[10px] outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-sticker-blue"
+                  />
+                </motion.article>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+
+      {createPortal(
+        <AnimatePresence>
+          {active && (
+            <ProjectModal key={active.id} project={active} tone={toneOf(active)} onClose={close} />
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </section>
   );
 }

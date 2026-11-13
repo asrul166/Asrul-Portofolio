@@ -1,7 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Mail, Github } from "lucide-react";
 import Typed from "./Typed";
+import Magnetic from "./Magnetic";
+import usePointerFine from "../hooks/usePointerFine";
+import { EMAIL, GITHUB } from "../data/site";
+import { copyEmail } from "../lib/toast";
+
+const clock = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Asia/Makassar",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+});
+
+// jam Makassar (WITA), berdetak tiap detik
+function LocalTime() {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  return <span className="tabular-nums text-fg">{clock.format(now)} WITA</span>;
+}
+
+const chipLink =
+  "inline-flex items-center gap-2 rounded-full border-2 border-fg bg-chip px-3 py-1 outline-none transition-[translate,box-shadow,background-color] hover:-translate-y-0.5 hover:bg-sticker-yellow hover:text-blk hover:shadow-[2px_2px_0_var(--color-fg)] focus-visible:bg-sticker-yellow focus-visible:text-blk";
 
 const bootLines = [
   { k: "role", v: "Informatics Engineering student" },
@@ -25,17 +52,19 @@ const rise = (delay = 0) => ({
 });
 
 export default function Hero() {
+  const canDrag = usePointerFine();
+
   return (
-    <section id="top" className="relative text-blk">
+    <section id="top" className="relative text-fg">
       <div className="mx-auto max-w-6xl px-6 pt-28 pb-16 grid gap-10 md:grid-cols-[1fr_1.25fr_1fr] items-center">
         
         {/* kiri: status.log (ditambah float-y dan animationDelay) */}
         <motion.div {...rise(0.1)} className="w-full max-w-sm mx-auto md:mx-0 md:justify-self-end">
           <div 
-            className="float-y md:-rotate-2 overflow-hidden rounded-xl border-2 border-blk bg-white shadow-[6px_6px_0_#111]"
+            className="float-y md:-rotate-2 overflow-hidden rounded-xl border-2 border-fg bg-surface shadow-[6px_6px_0_var(--color-fg)]"
             style={{ animationDelay: "0.5s" }}
           >
-            <div className="flex items-center gap-1.5 border-b-2 border-blk bg-sticker-yellow px-4 py-2">
+            <div className="flex items-center gap-1.5 border-b-2 border-fg bg-sticker-yellow px-4 py-2">
               <span className="w-2.5 h-2.5 rounded-full border-2 border-blk bg-cream" />
               <span className="w-2.5 h-2.5 rounded-full border-2 border-blk bg-cream" />
               <span className="w-2.5 h-2.5 rounded-full border-2 border-blk bg-cream" />
@@ -44,46 +73,65 @@ export default function Hero() {
             <div className="p-4 font-mono text-xs space-y-2">
               {bootLines.map((line) => (
                 <div key={line.k} className="flex gap-3">
-                  <span className="shrink-0 text-[#6B6558]">{line.k}</span>
-                  <span className={line.accent ? "font-bold text-[#2F7A4A]" : "text-blk"}>
+                  <span className="shrink-0 text-muted">{line.k}</span>
+                  <span className={line.accent ? "font-bold text-ok" : "text-fg"}>
+                    {line.accent && (
+                      <span className="relative mr-2 inline-flex h-2 w-2 align-middle">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ok opacity-75" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-ok" />
+                      </span>
+                    )}
                     {line.v}
                   </span>
                 </div>
               ))}
+              <div className="flex gap-3">
+                <span className="shrink-0 text-muted">time</span>
+                <LocalTime />
+              </div>
             </div>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2 font-mono text-xs">
-            <span className="inline-flex items-center gap-2 rounded-full border-2 border-blk bg-cream px-3 py-1">
-              <Mail size={13} /> asrulsaid16@gmail.com
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border-2 border-blk bg-cream px-3 py-1">
-              <Github size={13} /> github.com/asrul166
-            </span>
+            <button type="button" onClick={copyEmail} title="Copy email" className={`${chipLink} cursor-pointer`}>
+              <Mail size={13} /> {EMAIL}
+            </button>
+            <a href={GITHUB.url} target="_blank" rel="noreferrer" className={chipLink}>
+              <Github size={13} /> {GITHUB.label}
+            </a>
           </div>
         </motion.div>
 
         {/* tengah: judul */}
         <motion.div {...rise(0)} className="order-first md:order-none text-center">
-          <p className="font-mono text-xs uppercase tracking-widest text-[#6B6558]">
+          <p className="font-mono text-xs uppercase tracking-widest text-muted">
             <Typed text="$ whoami · by asrul" />
           </p>
 
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             {stickers.map((s, i) => (
-              <span
+              // pembungkus yang di-drag; animasi melayang tetap di span dalam
+              <motion.span
                 key={s.t}
-                style={{ animationDelay: `${-i * 0.9}s` }}
-                className={`${s.c} ${s.r} float-y wiggle inline-block rounded-md border-2 border-blk px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wide shadow-[2px_2px_0_#111]`}
+                drag={canDrag}
+                dragSnapToOrigin
+                dragElastic={0.6}
+                whileDrag={{ scale: 1.2, zIndex: 30 }}
+                className={`relative inline-block ${canDrag ? "cursor-grab active:cursor-grabbing" : ""}`}
               >
-                {s.t}
-              </span>
+                <span
+                  style={{ animationDelay: `${-i * 0.9}s` }}
+                  className={`${s.c} ${s.r} float-y wiggle inline-block select-none rounded-md border-2 border-fg px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wide shadow-[2px_2px_0_var(--color-fg)]`}
+                >
+                  {s.t}
+                </span>
+              </motion.span>
             ))}
           </div>
 
           <h1
             aria-label="ASRUL"
-            className="mt-5 inline-flex rounded-md border-2 border-blk bg-cream px-5 py-1 font-display text-6xl md:text-7xl font-bold tracking-wide shadow-[6px_6px_0_#111]"
+            className="mt-5 inline-flex rounded-md border-2 border-fg bg-chip px-5 py-1 font-name text-6xl md:text-7xl font-extrabold tracking-tight shadow-[6px_6px_0_var(--color-fg)]"
           >
             {"ASRUL".split("").map((ch, i) => (
               <motion.span
@@ -107,29 +155,33 @@ export default function Hero() {
 
           <h2 className="mt-6 text-2xl md:text-3xl font-extrabold leading-tight">
             From ideas to interfaces{" "}
-            <span className="inline-block h-6 w-6 rounded-full border-2 border-blk bg-sticker-green align-middle" />{" "}
+            <span className="inline-block h-6 w-6 rounded-full border-2 border-fg bg-sticker-green align-middle" />{" "}
             from code to solutions{" "}
-            <span className="inline-block h-6 w-6 rounded-full border-2 border-blk bg-sticker-pink align-middle" />
+            <span className="inline-block h-6 w-6 rounded-full border-2 border-fg bg-sticker-pink align-middle" />
           </h2>
 
-          <p className="mt-4 font-hand text-2xl leading-snug text-[#3A372F]">
+          <p className="mt-4 font-hand text-2xl leading-snug text-soft">
             Web apps, Mobile apps, and ERP systems. I learn by building them,
             one small working piece at a time.
           </p>
 
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <a
-              href="#contact"
-              className="btn-press inline-flex items-center gap-2 rounded-md border-2 border-blk bg-blk px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-cream shadow-[3px_3px_0_#F7C948] transition-transform hover:-translate-y-0.5"
-            >
-              Contact me <ArrowUpRight size={16} />
-            </a>
-            <a
-              href="#projects"
-              className="btn-press inline-flex items-center rounded-md border-2 border-blk bg-cream px-5 py-2.5 text-sm font-bold uppercase tracking-wide shadow-[3px_3px_0_#111] transition-transform hover:-translate-y-0.5"
-            >
-              View the log
-            </a>
+            <Magnetic>
+              <a
+                href="#contact"
+                className="btn-press inline-flex items-center gap-2 rounded-md border-2 border-fg bg-fg px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-bg shadow-[3px_3px_0_#F7C948] transition-transform hover:-translate-y-0.5"
+              >
+                Contact me <ArrowUpRight size={16} />
+              </a>
+            </Magnetic>
+            <Magnetic>
+              <a
+                href="#projects"
+                className="btn-press inline-flex items-center rounded-md border-2 border-fg bg-chip px-5 py-2.5 text-sm font-bold uppercase tracking-wide shadow-[3px_3px_0_var(--color-fg)] transition-transform hover:-translate-y-0.5"
+              >
+                View the log
+              </a>
+            </Magnetic>
           </div>
         </motion.div>
 
@@ -139,10 +191,10 @@ export default function Hero() {
             className="float-y md:rotate-2"
             style={{ animationDelay: "1.2s" }}
           >
-            <span className="relative z-10 -mb-[2px] ml-4 inline-block rounded-t-md border-2 border-b-0 border-blk bg-sticker-green px-3 py-1 font-mono text-xs font-bold">
+            <span className="relative z-10 -mb-[2px] ml-4 inline-block rounded-t-md border-2 border-b-0 border-fg bg-sticker-green px-3 py-1 font-mono text-xs font-bold">
               $ daily_rotation
             </span>
-            <div className="rounded-xl border-2 border-blk bg-white p-2 shadow-[6px_6px_0_#111]">
+            <div className="rounded-xl border-2 border-fg bg-surface p-2 shadow-[6px_6px_0_var(--color-fg)]">
               <iframe
                 title="Spotify playlist"
                 src="https://open.spotify.com/embed/playlist/2YKi8NMIafU4bElDX8zVt7?theme=0"

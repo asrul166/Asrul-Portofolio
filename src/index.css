@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Pixelify+Sans:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@800&family=Caveat:wght@600&family=Pixelify+Sans:wght@600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -21,10 +21,21 @@
   --color-sticker-blue: #8FB8FF;
   --color-sticker-orange: #FF9B54;
 
+  /* token yang ikut tema (nilai gelapnya ada di [data-theme="dark"] di bawah).
+     blk & cream TIDAK berubah: dipakai untuk teks di atas stiker dan area yang selalu gelap. */
+  --color-fg: #111111;       /* teks, garis tepi, bayangan */
+  --color-bg: #F6F1E7;       /* latar halaman */
+  --color-surface: #FFFFFF;  /* kartu */
+  --color-chip: #F6F1E7;     /* chip / tombol netral */
+  --color-soft: #4A463C;     /* teks paragraf */
+  --color-muted: #6B6558;    /* teks keterangan */
+  --color-ok: #2F7A4A;       /* status "open" */
+
   --font-mono: "JetBrains Mono", monospace;
   --font-sans: "Plus Jakarta Sans", sans-serif;
   --font-display: "Pixelify Sans", monospace;
   --font-hand: "Caveat", cursive;
+  --font-name: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif; /* khusus nama: ASRUL & "Hi, I'm Asrul" */
 }
 
 html {
@@ -32,12 +43,39 @@ html {
   scroll-padding-top: 5rem;
 }
 
+:root {
+  --dots: #D8D0BD;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --color-fg: #F5F2EC;
+  --color-bg: #0F1319;
+  --color-surface: #1D242E;
+  --color-chip: #2A3341;
+  --color-soft: #C9CFD8;
+  --color-muted: #96A0AE;
+  --color-ok: #8EDC9B;
+  --dots: #232B36;
+  color-scheme: dark;
+}
+
 body {
-  background-color: #F6F1E7;
-  background-image: radial-gradient(#D8D0BD 1px, transparent 1px);
+  background-color: var(--color-bg);
+  background-image: radial-gradient(var(--dots) 1px, transparent 1px);
   background-size: 22px 22px;
-  color: #111111;
+  color: var(--color-fg);
   font-family: "Plus Jakarta Sans", sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* teks di atas stiker berwarna selalu gelap, di tema apa pun */
+[class~="bg-sticker-yellow"],
+[class~="bg-sticker-green"],
+[class~="bg-sticker-pink"],
+[class~="bg-sticker-blue"],
+[class~="bg-sticker-orange"] {
+  color: var(--color-blk);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -107,6 +145,7 @@ body {
   animation: marquee 28s linear infinite;
   will-change: transform;
 }
+.marquee-track.reverse { animation-direction: reverse; }
 .marquee:hover .marquee-track { animation-play-state: paused; }
 
 /* stiker bergoyang saat di-hover */

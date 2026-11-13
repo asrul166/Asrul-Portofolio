@@ -9,7 +9,7 @@ export default function ScrollProgress() {
     <motion.div
       aria-hidden="true"
       style={{ scaleX, transformOrigin: "0% 50%" }}
-      className="fixed top-0 inset-x-0 z-50 h-1.5 border-b-2 border-blk bg-sticker-orange"
+      className="fixed top-0 inset-x-0 z-50 h-1.5 border-b-2 border-fg bg-sticker-orange"
     />
   );
 }
