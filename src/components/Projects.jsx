@@ -64,9 +64,7 @@ export default function Projects() {
 
       <div className="relative grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout" initial={false}>
-          {visible.map((p, i) => {
-            // pola bento saat "All": kartu lebar berselang-seling kiri/kanan
-            const wide = filter === "All" && (i % 4 === 0 || i % 4 === 3);
+          {visible.map((p) => {
             const tone = toneOf(p);
 
             return (
@@ -77,20 +75,15 @@ export default function Projects() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className={wide ? "lg:col-span-2" : ""}
               >
                 <motion.article
                   layoutId={`project-${p.id}`}
                   style={{ borderRadius: 12 }}
-                  className={`group relative flex h-full flex-col overflow-hidden border-2 border-fg bg-surface shadow-[5px_5px_0_var(--color-fg)] transition-[translate,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[8px_8px_0_var(--color-fg)] focus-within:-translate-y-1 focus-within:shadow-[8px_8px_0_var(--color-fg)] ${
-                    wide ? "lg:flex-row" : ""
-                  }`}
+                  className="group relative flex h-full flex-col overflow-hidden border-2 border-fg bg-surface shadow-[5px_5px_0_var(--color-fg)] transition-[translate,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[8px_8px_0_var(--color-fg)] focus-within:-translate-y-1 focus-within:shadow-[8px_8px_0_var(--color-fg)]"
                 >
                   <motion.div
                     layoutId={`cover-${p.id}`}
-                    className={`aspect-video shrink-0 overflow-hidden border-b-2 border-fg ${
-                      wide ? "lg:aspect-auto lg:w-1/2 lg:border-b-0 lg:border-r-2" : ""
-                    }`}
+                    className="shrink-0 border-b-2 border-fg"
                   >
                     <ProjectCover project={p} tone={tone} />
                   </motion.div>
@@ -109,11 +102,7 @@ export default function Projects() {
 
                     <h3 className="mt-3 text-lg font-extrabold leading-snug text-fg">{p.title}</h3>
 
-                    <p
-                      className={`mt-2 text-sm leading-relaxed text-soft ${
-                        wide ? "line-clamp-3 lg:line-clamp-5" : "line-clamp-3"
-                      }`}
-                    >
+                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-soft">
                       {p.desc}
                     </p>
 

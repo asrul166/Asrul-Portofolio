@@ -8,6 +8,35 @@ const chip = "rounded border-2 border-fg px-2 py-0.5 font-mono text-[11px] font-
 const action =
   "btn-press inline-flex items-center gap-2 rounded-md border-2 border-fg px-4 py-2 text-sm font-bold transition-[translate] hover:-translate-y-0.5";
 
+const heading = "mt-6 font-mono text-[11px] font-bold uppercase tracking-widest text-muted";
+
+// `teks` di antara backtick jadi <code>
+const withCode = (text) =>
+  text.split("`").map((part, i) =>
+    i % 2 ? (
+      <code key={i} className="rounded bg-chip px-1 font-mono text-[0.9em] text-fg">
+        {part}
+      </code>
+    ) : (
+      part
+    )
+  );
+
+function DetailList({ title, items }) {
+  if (!items?.length) return null;
+
+  return (
+    <>
+      <p className={heading}>{title}</p>
+      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-soft marker:text-fg">
+        {items.map((item) => (
+          <li key={item}>{withCode(item)}</li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
 export default function ProjectModal({ project, tone, onClose }) {
   const panelRef = useRef(null);
   const closeRef = useRef(null);
@@ -86,7 +115,7 @@ export default function ProjectModal({ project, tone, onClose }) {
         <div className="overflow-y-auto">
           <motion.div
             layoutId={`cover-${project.id}`}
-            className="aspect-video overflow-hidden border-b-2 border-fg"
+            className="border-b-2 border-fg"
           >
             <ProjectCover project={project} tone={tone} />
           </motion.div>
@@ -115,11 +144,12 @@ export default function ProjectModal({ project, tone, onClose }) {
               {project.title}
             </h3>
 
-            <p className="mt-3 leading-relaxed text-soft">{project.desc}</p>
+            <p className="mt-3 leading-relaxed text-soft">{project.longDesc || project.desc}</p>
 
-            <p className="mt-6 font-mono text-[11px] font-bold uppercase tracking-widest text-muted">
-              $ cat stack.txt
-            </p>
+            <DetailList title="$ cat fitur-utama.txt" items={project.features} />
+            <DetailList title="$ cat sorotan-teknis.txt" items={project.highlights} />
+
+            <p className={heading}>$ cat stack.txt</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {project.tags.map((t) => (
                 <span
@@ -155,6 +185,8 @@ export default function ProjectModal({ project, tone, onClose }) {
                 )}
               </div>
             )}
+
+            {project.credit && <p className="mt-6 text-xs text-muted">{project.credit}</p>}
           </motion.div>
         </div>
       </motion.div>

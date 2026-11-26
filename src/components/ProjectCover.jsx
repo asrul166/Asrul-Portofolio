@@ -76,7 +76,7 @@ export default function ProjectCover({ project, tone }) {
   const Mock = mocks[project.category] || DashboardMock;
 
   return (
-    <div className="flex h-full w-full flex-col bg-chip">
+    <div className="flex w-full flex-col bg-chip">
       <div className="flex shrink-0 items-center gap-1.5 border-b-2 border-fg bg-chip px-3 py-1.5">
         <span className="h-2 w-2 rounded-full border-2 border-fg bg-sticker-pink" />
         <span className="h-2 w-2 rounded-full border-2 border-fg bg-sticker-yellow" />
@@ -86,7 +86,7 @@ export default function ProjectCover({ project, tone }) {
         </span>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="aspect-[1200/630] overflow-hidden">
         {project.image ? (
           <img
             src={project.image}

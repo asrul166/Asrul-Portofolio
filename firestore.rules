@@ -1,0 +1,41 @@
+rules_version = '2';
+
+// Tempel isi file ini di Firebase Console > Firestore Database > Rules.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /comments/{commentId} {
+      allow read: if true;
+
+      // Komentar hanya diterima kalau di penulisan yang sama (batch) catatan
+      // cooldown pengirim ikut diperbarui dan menunjuk ke komentar ini.
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['name', 'message', 'createdAt'])
+        && request.resource.data.keys().hasAll(['name', 'message', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 40
+        && request.resource.data.name.matches('(?s).*\\S.*')
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 500
+        && request.resource.data.message.matches('(?s).*\\S.*')
+        && request.resource.data.createdAt == request.time
+        && getAfter(/databases/$(database)/documents/cooldowns/$(request.auth.uid)).data.commentId == commentId
+        && getAfter(/databases/$(database)/documents/cooldowns/$(request.auth.uid)).data.last == request.time;
+
+      // hapus komentar hanya lewat Firebase Console
+      allow update, delete: if false;
+    }
+
+    // satu dokumen per pengunjung: kapan terakhir berkomentar
+    match /cooldowns/{uid} {
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['last', 'commentId'])
+        && request.resource.data.last == request.time;
+
+      allow update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['last', 'commentId'])
+        && request.resource.data.last == request.time
+        && request.time > resource.data.last + duration.value(1, 'd');
+    }
+  }
+}
