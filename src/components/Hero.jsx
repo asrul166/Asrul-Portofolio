@@ -197,7 +197,7 @@ export default function Hero() {
             <div className="rounded-xl border-2 border-fg bg-surface p-2 shadow-[6px_6px_0_var(--color-fg)]">
               <iframe
                 title="Spotify playlist"
-                src="https://open.spotify.com/embed/playlist/4svmlqVhQs7SO5cS3gE3F8?utm_source=generator&theme=0"
+                src="https://open.spotify.com/embed/playlist/4svmlqVhQs7SO5cS3gE3F8?utm_source=generator"
                 width="100%"
                 height="352"
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
