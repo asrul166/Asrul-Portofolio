@@ -45,7 +45,8 @@ html {
 
 :root {
   --dots: #D8D0BD;
-  color-scheme: light;
+  /* "only" mencegah browser menggelapkan halaman secara paksa */
+  color-scheme: only light;
 }
 
 :root[data-theme="dark"] {
