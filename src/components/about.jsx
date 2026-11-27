@@ -10,13 +10,13 @@ const PHOTO_RATIO = "7 / 6";
 
 // Urutan: terbaru di atas. `current: true` = masih berjalan (titik berdenyut + label "now").
 const education = [
-  { org: "Universitas Dipa Makassar", title: "Informatics Engineering", period: "2024 – Present", logo: "/Undipa.png", current: true },
-  { org: "SMAN 4 Bantaeng", title: "Ilmu Pengetahuan Alam", period: "2021 – 2024", logo: "/SMAN4.png" },
+  { org: "Universitas Dipa Makassar", title: "Informatics Engineering", period: "2024 – Present", logo: "/Undipa.webp", current: true },
+  { org: "SMAN 4 Bantaeng", title: "Ilmu Pengetahuan Alam", period: "2021 – 2024", logo: "/SMAN4.webp" },
 ];
 
 const experience = [
-  { org: "BBLSDM Komdigi Makassar", title: "Magang", period: "Sep 2026 – Jan 2027", logo: "/Komdigi.png", current: true },
-  { org: "SolvexaERP", title: "Technical & Social Media", period: "2026 – Present", logo: "/Solvexa.png", current: true },
+  { org: "BBLSDM Komdigi Makassar", title: "Magang", period: "Sep 2026 – Jan 2027", logo: "/Komdigi.webp", current: true },
+  { org: "SolvexaERP", title: "Technical & Social Media", period: "2026 – Present", logo: "/Solvexa.webp", current: true },
   { org: "Google Developer Group on Campus Universitas Hasanuddin", title: "Member", period: "2025 – 2026", logo: "/google-developers.svg" },
   { org: "Google Developer Group on Campus Universitas Hasanuddin", title: "Member", period: "2024 – 2025", logo: "/google-developers.svg" },
 ];
